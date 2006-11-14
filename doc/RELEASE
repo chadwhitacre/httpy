@@ -3,6 +3,9 @@
 While releasing, track updates to this doc in a tmp file, and then change the
 doc on trunk/ again after the release is done.
 
+Add a ~~DATE~~ to parallel ~~VERSION~~
+take make version out of make dist
+
 """
 
 # Tag
@@ -36,18 +39,27 @@ run through install on a clean box
     python -c"import httpy"
 
 
+# Prepare index.html
+# ==================
+
+- cp http://www.zetadev.com/software/httpy/index.html
+- update:
+    bump current to old version
+    add new version
+        updated links
+        text of doc/HISTORY
+
+
 # Announce
 # ========
 # The first announcement is to register with PyPI. Under Python 2.5 we also have
 # the option to upload to PyPI.
 
+- move new index.html into place
 $ python setup.py register
-- update http://www.zetadev.com/software/httpy/index.html
-    bump current to old version
-    add new version
-        updated links
-        text of doc/HISTORY
+- test that `easy_install httpy` works
 - announce on ...
     nntp://comp.lang.python.announce
     http://tech.whit537.org/
     Web-SIG
+    wsgi.org middleware page
