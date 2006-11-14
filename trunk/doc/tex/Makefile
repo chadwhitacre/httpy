@@ -1,8 +1,7 @@
 # Makefile to create documentation using the Python LaTeX system. Set the
 # PYTHONSRC environment variable to the root of a Python source distribution.
-# This file also obeys the VERSION envvar set in the root Makefile.
 
-#VERSION=~~VERSION~~
+VERSION=~~VERSION~~
 #PYTHONSRC=/home/whit537/python/2.4.3/src
 MKHOWTO    = $(PYTHONSRC)/Doc/tools/mkhowto \
 				--iconserver icons \
@@ -18,6 +17,8 @@ MKHOWTO    = $(PYTHONSRC)/Doc/tools/mkhowto \
 
 
 default: html
+
+all: html pdf clean
 
 html: clean
 	$(MKHOWTO) httpy.tex
