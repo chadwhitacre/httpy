@@ -20,7 +20,7 @@ from email.Message import Message
 
 
 __author__ = "Chad Whitacre <chad@zetaweb.com>"
-__version__ = "~~VERSION~~"
+__version__ = "1.0a1"
 __all__ = ('Responder', 'Response')
 
 
