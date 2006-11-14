@@ -1,7 +1,7 @@
 # This Makefile is used to create an httpy distribution. Before calling, set the
 # VERSION environment variable.
 
-VERSION=1.0-trunk
+VERSION=1.0a1
 
 clean:
 # remove all of the cruft that gets auto-generated on doc/install/release

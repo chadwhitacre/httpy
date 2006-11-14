@@ -19,7 +19,7 @@ classifiers = [
 
 
 setup( name='httpy'
-     , version='~~VERSION~~'
+     , version='1.0a1'
      , package_dir = {'':'src'}
      , py_modules=['httpy']
      , description = "httpy smooths out a few of WSGI's most glaring warts."
