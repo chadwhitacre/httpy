@@ -1,0 +1,172 @@
+% Complete documentation on the extended LaTeX markup used for Python
+% documentation is available in ``Documenting Python'', which is part
+% of the standard documentation for Python.  It may be found online
+% at:
+%
+%     http://www.python.org/doc/current/doc/doc.html
+
+\documentclass{manual}
+
+\title{httpy}
+
+\author{Chad W. L. Whitacre}
+
+% Please at least include a long-lived email address;
+% the rest is at your discretion.
+\authoraddress{
+	Zeta Design \&\ Development \\
+	\url{http://www.zetadev.com/software/httpy/} \\
+	Email: \email{\ulink{chad@zetaweb.com}{mailto:chad@zetaweb.com}}
+}
+
+%\date{January 1, 1970} % update before release!
+\date\today
+				% Use an explicit date so that reformatting
+				% doesn't cause a new date to be used.  Setting
+				% the date to \today can be used during draft
+				% stages to make it easier to handle versions.
+
+\release{~~VERSION~~}			% release version; this is used to define the
+				% \version macro
+
+%\makeindex			% tell \index to actually write the .idx file
+%\makemodindex			% If this contains a lot of module sections.
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\noindent
+\module{httpy} is a Python module that smooths out WSGI's most glaring warts.
+
+\end{abstract}
+
+
+\chapter{API Reference \label{api}}
+
+The request side of WSGI---the "commons" of the \var{environ} mapping---is quite
+nice. It honors the tradition of CGI, and it's just a mapping. Simple.
+
+The response-side API is a little stiffer, because WSGI has to support edge
+cases like serving large files, complex exception handling, and HTTP/1.1
+features. This results in warts like \code{start_response}, and the requirement
+that apps return an iterable. The intention in \ulink{PEP
+333}{http://www.python.org/dev/peps/pep-0333/} is that these warts be smoothed
+over at other layers; this is such a layer.
+
+\module{httpy} provides the following classes:
+
+\begin{classdesc}{Responder}{\var{app}}
+Constructs a new \class{Responder} object. \var{app} is an extended WSGI
+application: it may alternately return a string, or return or raise a
+\class{Response} object.
+\end{classdesc}
+
+\begin{classdesc}{Response}{\optional{code} \optional{, body} \optional{,
+    headers}}
+Constructs a new \class{Response} object. If given, \var{code} must be an
+integer; the default is
+\ulink{200}{http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1}
+(see \ulink{the HTTP
+spec}{http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html} for other values
+that will be meaningful to most HTTP clients). \var{body} must be a string.
+\var{headers} may be a dictionary or a list of 2-tuples. \var{body} is second
+rather than \var{headers} because one more often wants to specify a body without
+headers than vice versa.
+\end{classdesc}
+
+
+\section{\class{Responder} Objects \label{responder}}
+
+Instances of \class{httpy.Responder} are middleware that speak plain WSGI on the
+server side, but they also accept strings and \class{Response} objects from the
+application side. When a \class{Responder} receives a \class{Response} object,
+that becomes the WSGI endpoint. When a \class{Responder} receives a string, it
+creates a \class{Response} object with the string as the \var{body}, and the
+\mailheader{Content-Type} set to \code{text/html}. This implicit
+\class{Response} then becomes the endpoint.
+
+
+\section{\class{Response} Objects \label{response}}
+
+Instances of \class{httpy.Response} are also plain WSGI applications, with the
+following data attributes. Note that values are only validated in the
+constructor, so it is currently possible to return/raise a malformed
+\class{Response} by setting instance attributes post-instantiation.
+
+\begin{datadesc}{code}
+The \ulink{HTTP code}{http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html} as an integer.
+\end{datadesc}
+
+\begin{datadesc}{body}
+The message body as a string.
+\end{datadesc}
+
+\begin{datadesc}{headers}
+The message headers as an instance of the standard library's
+\ulink{\module{email.Message.Message}}{http://docs.python.org/lib/module-email.message.html}.
+\end{datadesc}
+
+When called, \class{Response} instances call \code{start_response} with
+adaptations of \var{code} and \var{headers}, and return a one-item list
+containing \var{body}.
+
+
+\chapter{Example \label{example}}
+
+Here is an example:
+
+\begin{verbatim}
+Python 2.5 (r25:52005, Sep 25 2006, 21:37:36)
+[GCC 3.4.4 [FreeBSD] 20050518] on freebsd6
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+>>> import httpy
+>>> app = lambda env, start: "Greetings, program!"
+>>> app = httpy.Responder(app)
+>>>
+>>> from wsgiref.simple_server import make_server
+>>> server = make_server('', 8080, app)
+>>> server.serve_forever() # now hit http://localhost:8080/
+>>>
+192.168.1.100 - - [09/Nov/2006 23:52:45] "GET / HTTP/1.1" 200 19
+\end{verbatim}
+
+\chapter{Copyright and License \label{legal}}
+
+Copyright (c) 2006, Chad Whitacre <chad@zetaweb.com>. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+\begin{itemize}
+
+\item{Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.}
+
+\item{Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.}
+
+\item{Neither the name of Chad Whitacre nor the names of any other contributors
+or copyright holders may be used to endorse or promote products derived from
+this software without specific prior written permission.}
+
+\end{itemize}
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+\end{document}
